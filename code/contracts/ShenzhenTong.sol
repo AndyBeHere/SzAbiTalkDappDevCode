@@ -9,13 +9,13 @@ contract ShenzhenTong {
 	string[] public stations;
 
 	// 每个人的开始地铁站 (如果不在深圳通=零下一)
-	mapping (address => uint) public start_station;
+	mapping (address => int) public start_station;
 
 	constructor(uint costPerStation) public {
 		feePerStation = costPerStation;
-		stations.push("luohu");
-		stations.push("wow");
-		stations.push("airport");
+		stations.push("罗湖");
+		stations.push("世界之窗");
+		stations.push("机场东");
 	}
 
 	function getNumberOfStations() public constant returns (uint) {
@@ -33,41 +33,39 @@ contract ShenzhenTong {
 	}
 
 	// 扫卡入
-	function swipeIn(string station) public {
-		uint startStationId = getStationId(station);
-		require(startStationId > 0);
+	function swipeIn(string station) public returns (int a) {
+		int startStationId = getStationId(station);
+		require(startStationId >= 0);
 		start_station[msg.sender] = startStationId;
+		return startStationId;
 	}
 
 	// 扫卡出
 	function swipeOut(string station) public {
-		uint startStationId = start_station[msg.sender];
-		uint endStationId = getStationId(station);
-		require(startStationId > 0 && endStationId > 0);
+		int startStationId = start_station[msg.sender];
+		int endStationId = getStationId(station);
+		require(startStationId >= 0 && endStationId >= 0);
 
-		int distance = int(endStationId) - int(startStationId);
+		int distance = endStationId - startStationId;
 		if (distance < 0) {
 			distance = distance * -1;
 		}
 
 		// 成本
 		uint cost = uint(distance) * feePerStation;
-
-		require(card_balances[msg.sender] - cost > 0);
-
-		// 行，可以从余额中减成本
-		card_balances[msg.sender] -= cost;
+		require(int(card_balances[msg.sender]) - int(cost) >= 0);
+		card_balances[msg.sender] -= cost; // 行，可以从余额中减成本
 	}
 
 	// StationId 是地铁站ID = 名字在array + 1
 	// 无效的地铁名 = 0
-	function getStationId(string stationName) returns (uint stationId) {
+	function getStationId(string stationName) returns (int stationId) {
 		for (uint i = 0; i < stations.length; i++) {
 			if (keccak256(stations[i]) == keccak256(stationName)) {
-				return i + 1;
+				return int(i);
 			}
 		}
 
-		return 0;
+		return -1;
 	}
 }

@@ -24,9 +24,18 @@ SZT.getBalance.call({from: userA}).then(function(r) { console.log(r.toString());
 ```
 > 加100块和检查你的深圳通余额
 
+```JavaScript
+SZT.swipeIn("罗湖", {from: userA});
+SZT.swipeOut("世界之窗", {from: userA});
+```
+> 在罗湖扫入，在世界之窗扫出（花10块 = feePerStation * 1 = 10 * 1）
 
 ```JavaScript
-SZT.swipeIn.call('luohu', {from: userA}).then(function(r) {console.log(r.toString());}); // 运行之后要等待新的block
-SZT.swipeOut.call("wow", {from: userA}).then(function(r) {console.log(r.toString());}); // 新的block之后可以运行
+SZT.swipeIn("机场东", {from: userA});
+SZT.swipeOut("罗湖", {from: userA});
 ```
-> 在罗湖扫入，在世界之窗扫出。注意运行第一行之后要等ganache做新的block
+> 在机场东扫入，在罗湖扫出（花20块 = feePerStation * 2 = 10 * 2）
+
+
+
+
